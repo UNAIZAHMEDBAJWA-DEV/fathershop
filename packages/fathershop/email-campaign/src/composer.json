@@ -1,0 +1,19 @@
+{
+    "name": "fathershop/email-campaign",
+    "description": "A Laravel package for managing email campaigns and customer filtering.",
+    "autoload": {
+      "psr-4": {
+        "EmailCampaign\\": "src/"
+      }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+   "extra": {
+  "laravel": {
+    "providers": [
+      "fatherShop\\EmailCampaign\\EmailCampaignServiceProvider"
+    ]
+  }
+}
+  }
+  

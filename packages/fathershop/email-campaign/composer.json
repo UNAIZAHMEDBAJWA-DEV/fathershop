@@ -1,0 +1,16 @@
+{
+  "name": "fathershop/email-campaign",
+  "autoload": {
+    "psr-4": {
+      "fatherShop\\EmailCampaign\\": "src/"
+    }
+  },
+"extra": {
+  "laravel": {
+    "providers": [
+      "fatherShop\\EmailCampaign\\EmailCampaignServiceProvider"
+    ]
+  }
+}
+
+}
