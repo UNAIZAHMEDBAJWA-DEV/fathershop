@@ -1,7 +1,8 @@
 # Fathershop Project
 
 ## Description
-Fathershop is a Laravel-based web application that allows you to manage email campaigns, filter customers, and send bulk emails with tracking.
+Fathershop is a Laravel-based web application that allows you to manage email campaigns, filter customers, and send bulk emails with tracking, This Laravel package allows you to manage and send email campaigns with support for filtering customers, background email processing using jobs and queues, and integration with SendGrid for email delivery.
+
 
 ## Installation
 
@@ -83,23 +84,70 @@ Make sure you have the following installed on your machine:
 
     This will create the required tables in your database.
 
-7. **Serve the application**:
-
-    You can now run the application locally using:
-
-    ```bash
-    php artisan serve
-    ```
-
-    The app will be available at `http://127.0.0.1:8000`.
 
 ---
 
-## Usage
+7. **Package Setup**:
+Make sure the package is registered in your Laravel app's composer.json:
 
-### Create Campaign
+"repositories": [
+    {
+        "type": "path",
+        "url": "packages/father/email-campaign"
+    }
+]
+----
 
-To create a new email campaign, make a `POST` request to the following endpoint:
+composer require father/email-campaign
 
+-----
 
+8. **Queue Setup** :
 
+To send emails in the background using Laravel jobs:
+Start the queue worker:
+
+php artisan queue:work
+
+Make sure QUEUE_CONNECTION=database in .env.
+run:
+php artisan queue:table
+php artisan migrate
+
+**API Routes Overview**
+
+1. POST /create-campaign
+Creates a new email campaign.
+
+Required: title, subject, body.
+
+Returns the campaignId.
+
+2. POST /send-campaign/{campaignId}
+Sends the campaign to filtered customers.
+
+Accepts filters as an array (e.g., status, expiry).
+
+Dispatches email jobs for each customer.
+
+3. GET /send-email-grid
+
+Sends a test email to confirm SendGrid is working.
+
+Useful for debugging or verifying SMTP setup.
+
+packages/
+└── father/
+    └── email-campaign/
+        ├── composer.json
+        ├── src/
+        │   ├── CampaignManager.php
+        │   ├── EmailCampaignServiceProvider.php
+        │   └── Jobs/
+        │       └── CampaignJob.php
+        ├── routes/
+        │   └── api.php
+        ├── resources/views/email.blade.php
+        └── database/migrations/
+            ├── create_customers_table.php
+            └── create_campaigns_table.php

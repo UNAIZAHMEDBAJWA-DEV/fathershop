@@ -40,6 +40,7 @@ Route::post('/send-campaign/{campaignId}', function ($campaignId, Request $reque
 
 
 Route::get('/send-email-grid', function () {
+    return 'successfully send';
     $to = 'unaiz@yopmail.com'; // replace with the recipient's email
     Mail::raw('This is a test email using SendGrid!', function ($message) use ($to) {
         $message->to($to)
