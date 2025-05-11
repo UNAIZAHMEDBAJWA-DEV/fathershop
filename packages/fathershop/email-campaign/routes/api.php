@@ -43,7 +43,7 @@ Route::post('/send-campaign/{campaignId}', function ($campaignId, Request $reque
         $campaign = Campaign::findOrFail($campaignId);
 
         foreach ($customers as $customer) {
-            CampaignJob::dispatch($customer->email, $campaign->subject, $campaign->body);
+            CampaignJob::dispatch($customer, $campaign);
         }
 
         return response()->json(['status' => 'Emails queued for sending']);
@@ -62,7 +62,7 @@ Route::post('/send-campaign/{campaignId}', function ($campaignId, Request $reque
 Route::get('/send-email-grid', function () {
     $to = 'unaiz@yopmail.com'; // replace with the recipient's email
     Mail::raw('This is a test email using SendGrid!', function ($message) use ($to) {
-        $message->to($to)
+            $message->to($to)
                 ->subject('Test Email from Laravel using SendGrid');
     });
     return 'Email sent!';

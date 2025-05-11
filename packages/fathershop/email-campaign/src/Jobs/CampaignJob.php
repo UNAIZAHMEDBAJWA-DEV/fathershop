@@ -1,40 +1,38 @@
 <?php
-
-
 namespace fatherShop\EmailCampaign\Jobs;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Mail;
+use fatherShop\EmailCampaign\Models\Campaign;
+use fatherShop\EmailCampaign\Models\Customer;
 
 class CampaignJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $email, $subject, $body;
+    public  $customer;
+    public  $campaign;
 
-    public function __construct($email, $subject, $body)
+    public function __construct(Customer $customer, Campaign $campaign)
     {
-        $this->email = $email;
-        $this->subject = $subject;
-        $this->body = $body;
+        $this->customer = $customer;
+        $this->campaign = $campaign;
     }
 
     public function handle()
     {
-        if (filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+        if (filter_var($this->customer->email, FILTER_VALIDATE_EMAIL)) {
             Mail::send('emailcampaign::email', [
-                'body' => $campaign->body,
-                'subject' => $campaign->subject,
-            ], function ($message) use ($customer, $campaign) {
-                $message->to($customer->email);
-                $message->subject($campaign->subject);
+                'body' => $this->campaign->body,
+                'subject' => $this->campaign->subject,
+            ], function ($message) {
+                $message->to($this->customer->email);
+                $message->subject($this->campaign->subject);
             });
-            
         }
-        
     }
 }
