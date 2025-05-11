@@ -2,9 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use EmailCampaign\CampaignManager;
-use EmailCampaign\Jobs\CampaignJob;
- // Correct Request import
+use fatherShop\EmailCampaign\CampaignManager;
+use fatherShop\EmailCampaign\Jobs\CampaignJob;
+use fatherShop\EmailCampaign\Models\Campaign;
 
 Route::post('/create-campaign', function (Request $request) {
     try {
@@ -24,20 +24,40 @@ Route::post('/create-campaign', function (Request $request) {
     }
 });
 
+
 Route::post('/send-campaign/{campaignId}', function ($campaignId, Request $request) {
-    $data = $request->validate([
-        'filters' => 'array',
-    ]);
-    $manager = new CampaignManager();
-    $customers = $manager->filterCustomers($data['filters'] ?? []);
+    try {
+        Log::info('Request received for campaign sending', [
+            'campaignId' => $campaignId,
+            'filters' => $request->all(),
+        ]);
 
-    foreach ($customers as $customer) {
-        CampaignJob::dispatch($customer->email, $customer->subject, $customer->body);
+        $data = $request->validate([
+            'filters' => 'array',
+        ]);
+
+        $manager = new CampaignManager();
+        $customers = $manager->filterCustomers($data['filters'] ?? []);
+        Log::info('Customers filtered successfully', ['customerCount' => count($customers)]);
+
+        $campaign = Campaign::findOrFail($campaignId);
+
+        foreach ($customers as $customer) {
+            CampaignJob::dispatch($customer->email, $campaign->subject, $campaign->body);
+        }
+
+        return response()->json(['status' => 'Emails queued for sending']);
+
+    } catch (\Throwable $th) {
+        Log::error('Error in sending campaign emails', [
+            'campaignId' => $campaignId,
+            'errorMessage' => $th->getMessage(),
+            'errorTrace' => $th->getTraceAsString()
+        ]);
+
+        return response()->json(['error' => 'Failed to send campaign'], 500);
     }
-
-    return response()->json(['status' => 'Emails queued for sending']);
 });
-
 
 Route::get('/send-email-grid', function () {
     $to = 'unaiz@yopmail.com'; // replace with the recipient's email
@@ -47,4 +67,7 @@ Route::get('/send-email-grid', function () {
     });
     return 'Email sent!';
 });
+
+
+
 

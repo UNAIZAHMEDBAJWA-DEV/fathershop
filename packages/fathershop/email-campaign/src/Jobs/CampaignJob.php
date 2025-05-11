@@ -1,5 +1,7 @@
 <?php
-namespace EmailCampaign;
+
+
+namespace fatherShop\EmailCampaign\Jobs;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -23,12 +25,16 @@ class CampaignJob implements ShouldQueue
 
     public function handle()
     {
-        if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
-            Mail::send('emailcampaign::email', ['body' => $this->body], function ($message) {
-                $message->to($this->email)
-                        ->subject($this->subject);
+        if (filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+            Mail::send('emailcampaign::email', [
+                'body' => $campaign->body,
+                'subject' => $campaign->subject,
+            ], function ($message) use ($customer, $campaign) {
+                $message->to($customer->email);
+                $message->subject($campaign->subject);
             });
-    
+            
         }
+        
     }
 }

@@ -1,9 +1,6 @@
-<!DOCTYPE html>
 <html>
-<head>
-    <title>{{ $subject }}</title>
-</head>
 <body>
-    <p>{!! $body !!}</p>
+    <h1>{{ $subject }}</h1>
+    <!-- other email content -->
 </body>
 </html>

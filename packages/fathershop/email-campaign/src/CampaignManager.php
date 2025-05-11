@@ -1,34 +1,39 @@
 <?php
 
-namespace EmailCampaign;
+namespace fatherShop\EmailCampaign;
 
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class CampaignManager
 {
-    public function createCampaign(string $title, string $subject, string $body)
+    // Store Campaign
+    public function createCampaign($title, $subject, $body)
     {
-        return DB::table('campaigns')->insertGetId([
-            'title' => $title ?? 'null',
-            'subject' => $subject ?? 'null',
-            'body' => $body ?? 'null',
+        // Store the campaign in the database
+        $campaign = DB::table('campaigns')->insertGetId([
+            'title' => $title,
+            'subject' => $subject,
+            'body' => $body,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        return $campaign;
     }
 
-    public function filterCustomers(array $filters)
+    // Filter Customers based on certain criteria (status, expiry date)
+    public function filterCustomers($filters)
     {
         $query = DB::table('customers');
-        
+
+        // Filter based on status
         if (isset($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
-        if (isset($filters['expiry_date'])) {
-            $expiryDate = Carbon::now()->addDays($filters['expiry_date']);
-            $query->where('plan_expiry_date', '<=', $expiryDate);
+        // Filter based on plan expiry
+        if (isset($filters['plan_expiry_date'])) {
+            $query->where('plan_expiry_date', '<=', now()->addDays($filters['plan_expiry_date']));
         }
 
         return $query->get();
